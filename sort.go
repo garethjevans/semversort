@@ -6,74 +6,22 @@ import (
 	"github.com/urfave/cli/v2"
 	"io"
 	"os"
+	"sort"
 )
 
 const name = "semversort"
 const version = "0.1.0"
 const description = `Version Tester. Compare versions.
 
-SemverSort is a tool for comparing two version strings, or comparing a version string
-to a version range.
+SemverSort is a tool for sorting a list of versions based on Carvels semver constraints
 
-	$ semversort ">1.0.0" 1.1.0
-	1.1.0
-
-	$ semversort "<1.0.0" 1.1.0
-	   # No output because nothing matched.
-
-	$ semversort -f "<1.0.0" 1.1.0
-	1.1.0   # -f returns all failures, rather than matches.
-
-	$ semversort ">1.0.0" 1.1.0 1.1.1 1.2.3 0.1.1
-	1.1.0
-	1.1.1
+	$ semversort 1.1.0 1.1.1 1.2.3 0.1.1
 	1.2.3
+	1.1.1
+	1.1.0
+    0.1.1
 
 See below for information about how to determine the number of failed tests.
-
-EXIT CODES:
-
-vert returns exit codes based on the number of failed matches. There are a few
-reserved exit codes:
-
-- 128: The command was not called correctly.
-- 256: A version failed to parse, and comparisons could not continue. This will
-  occur if the original constraint version cannot be parsed. If any
-  subsequent version fails to parse, it will simply be counted as a failure.
-
-Any other error codes indicate the number of failed tests. For example:
-
-	$ vert 1.2.3 1.2.3 1.2.4 1.2.5
-	1.2.3
-	$ echo $?
-	2   # <-- Two tests failed.
-
-BASE VERSIONS:
-
-The base version may be in any of the following formats:
-
-- An exact semantic version number
-	- 1.2.3
-	- v1.2.3
-	- 1.2.3-alpha.1+10212015
-- A semantic version range
-	- *
-	- !=1.0.0
-	- >=1.2.3
-	- >1.2.3,<1.3.2
-	- ~1.2.0
-	- ^2.3
-
-VERSIONS:
-
-Other than the base version, all other supplied versions must follow the
-SemVer 2 spec. Examples:
-
-	- 1.2.3
-	- v1.2.3
-	- 1.2.3-alpha.1+10212015
-	- v1.2.3-alpha.1+10212015
-	- 1 (equivalent to 1.0.0)
 `
 
 func main() {
@@ -101,38 +49,54 @@ func run(c context) error {
 		return fmt.Errorf("not enough arguments")
 	}
 
-	pass := compare(args.Slice())
+	versions := compare(args.Slice())
 
-	out := pass
+	sort.SliceStable(versions, func(i, j int) bool {
+		return versions[i].Version.GT(versions[j].Version)
+	})
 
-	PrintVersion(out)
+	PrintVersion(versions)
 	return nil
 }
 
 // compare compiles a base version comparator, and then compares all cases to it.
 //
 // It retuns an array of versions that passed, and an array of versions that failed.
-func compare(cases []string) []semver.Version {
-	var passed []semver.Version
+func compare(cases []string) []SemverWrap {
+	var versions []SemverWrap
 
 	for _, t := range cases {
-		ver, err := semver.Make(t)
+		ver, err := NewSemver(t)
 		if err != nil {
 			PrintError("Failed to parse %s", t)
 			continue
 		}
 
-		passed = append(passed, ver)
+		versions = append(versions, ver)
 	}
 
-	return passed
+	return versions
 }
 
 var stdout io.Writer = os.Stdout
 var stderr io.Writer = os.Stderr
 
+type SemverWrap struct {
+	semver.Version
+	Original string
+}
+
+func NewSemver(version string) (SemverWrap, error) {
+	parsedVersion, err := semver.Parse(version)
+	if err != nil {
+		return SemverWrap{}, err
+	}
+
+	return SemverWrap{parsedVersion, version}, nil
+}
+
 // PrintVersion prints a list of versions to standard out.
-func PrintVersion(vers []semver.Version) {
+func PrintVersion(vers []SemverWrap) {
 	for _, v := range vers {
 		fmt.Fprintln(stdout, v.String())
 	}
