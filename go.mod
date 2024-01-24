@@ -2,10 +2,13 @@ module github.com/garethjevans/semversort
 
 go 1.21.5
 
-require github.com/urfave/cli v1.22.14
+require (
+github.com/carvel-dev/semver/v4 v4.0.1-0.20230221220520-8090ce423695
+)
 
 require (
-	github.com/Masterminds/semver/v3 v3.2.1 // indirect
-	github.com/cpuguy83/go-md2man/v2 v2.0.2 // indirect
+	github.com/cpuguy83/go-md2man/v2 v2.0.3 // indirect
 	github.com/russross/blackfriday/v2 v2.1.0 // indirect
+	github.com/urfave/cli/v2 v2.27.1 // indirect
+	github.com/xrash/smetrics v0.0.0-20231213231151-1d8dd44e695e // indirect
 )
