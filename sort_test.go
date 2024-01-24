@@ -41,6 +41,10 @@ func TestRun(t *testing.T) {
 			args: NewMockArgs([]string{"1.0.0", "1.1.1", "1.2.3", "1.0.1", "0.9.0"}),
 			out:  "1.2.3\n1.1.1\n1.0.1\n1.0.0\n0.9.0\n",
 		},
+		{
+			args: NewMockArgs([]string{"1.0.0", "XXXX", "1.2.3", "1.0.1", "0.9.0"}),
+			out:  "1.2.3\n1.0.1\n1.0.0\n0.9.0\n",
+		},
 	}
 
 	for _, tt := range tests {

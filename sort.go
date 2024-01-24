@@ -68,7 +68,7 @@ func compare(cases []string) []SemverWrap {
 	for _, t := range cases {
 		ver, err := NewSemver(t)
 		if err != nil {
-			PrintError("Failed to parse %s", t)
+			// ignore
 			continue
 		}
 
