@@ -15,7 +15,12 @@ var (
 		RunE:  sortCmd,
 		// FIXME two args
 	}
+	rangeString string
 )
+
+func init() {
+	sortCommand.Flags().StringVarP(&rangeString, "range", "r", "", "Use a range to filter versions")
+}
 
 func sortCmd(cmd *cobra.Command, args []string) error {
 	in := ReadFromArgsOrStdin(args[0:], cmd.InOrStdin())
@@ -31,10 +36,19 @@ func sortCmd(cmd *cobra.Command, args []string) error {
 
 // compare compiles a base version comparator, and then compares all cases to it.
 //
-// It retuns an array of versions that passed, and an array of versions that failed.
+// It returns an array of versions that passed, and an array of versions that failed.
 func compare(cases []string) []SemverWrap {
-	var versions []SemverWrap
+	var err error
+	var r semver.Range
 
+	if rangeString != "" {
+		r, err = semver.ParseRange(rangeString)
+		if err != nil {
+			fmt.Printf("Unable to parse range '%s'\n", rangeString)
+		}
+	}
+
+	var versions []SemverWrap
 	for _, t := range cases {
 		ver, err := NewSemver(t)
 		if err != nil {
@@ -42,7 +56,13 @@ func compare(cases []string) []SemverWrap {
 			continue
 		}
 
-		versions = append(versions, ver)
+		if rangeString != "" {
+			if r(ver.Version) {
+				versions = append(versions, ver)
+			}
+		} else {
+			versions = append(versions, ver)
+		}
 	}
 
 	return versions

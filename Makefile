@@ -17,7 +17,7 @@ test-bump: build
 
 test-sort: build
 	./semver sort 1.2.4 1.2.2 1.2.1 2.0.0
-	curl https://artifactory.eng.vmware.com/artifactory/api/storage/tap-builds-generic-local/1.8.0 | jq -r '.children[] | .uri' | sed 's/\///' | sed 's/\.yaml//' | ./semver sort
+	curl -sS https://artifactory.eng.vmware.com/artifactory/api/storage/tap-builds-generic-local/ | jq -r '.children[] | .uri' | sed 's/\///' | sed 's/\.yaml//' | ./semver sort --range ">1.5.0 <1.7.0"
 
 test-rewrite: build
 	./semver rewrite 1.2.3-alpha.1+123 'rel-{{bump_minor.Major}}.{{bump_minor.Minor}}.x'

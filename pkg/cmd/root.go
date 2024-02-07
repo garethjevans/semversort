@@ -21,5 +21,5 @@ func init() {
 	rootCmd.AddCommand(getCommand)
 	rootCmd.AddCommand(bumpCommand)
 	rootCmd.AddCommand(sortCommand)
-	rootCmd.AddCommand(rewriteCommand)
+	//rootCmd.AddCommand(rewriteCommand)
 }
