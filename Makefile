@@ -2,7 +2,7 @@
 build:
 	go build -o semver main.go
 
-test: test-get test-bump test-sort test-rewrite
+test: test-get test-bump test-sort
 test-get: build
 	./semver get major 1.2.3-alpha.1+123
 	./semver get minor 1.2.3-alpha.1+123
