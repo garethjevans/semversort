@@ -14,6 +14,8 @@ test-bump: build
 	./semver bump major 1.2.3-alpha.1+123
 	./semver bump minor 1.2.3-alpha.1+123
 	./semver bump patch 1.2.3-alpha.1+123
+	./semver bump pre alpha 1.2.3-alpha.1+123
+	./semver bump pre beta 1.2.3-alpha.1+123
 
 test-sort: build
 	./semver sort 1.2.4 1.2.2 1.2.1 2.0.0

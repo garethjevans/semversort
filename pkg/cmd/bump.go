@@ -3,6 +3,7 @@ package cmd
 import (
 	"fmt"
 	"github.com/carvel-dev/semver/v4"
+	"github.com/garethjevans/semver/pkg/bump"
 	"github.com/spf13/cobra"
 )
 
@@ -11,7 +12,7 @@ var (
 		Use:   "bump",
 		Short: "bump a part of a carvel compatible semantic version",
 		Long:  `bump a part of a carvel compatible semantic version`,
-		RunE:  bump,
+		RunE:  run,
 	}
 )
 
@@ -19,35 +20,37 @@ func init() {
 	bumpCommand.Flags().StringVarP(&Out, "out", "o", "", "Write the output to a file")
 }
 
-func bump(cmd *cobra.Command, args []string) error {
+func run(cmd *cobra.Command, args []string) error {
 	part := args[0]
-	in := ReadFromArgsOrStdin(args[1:], cmd.InOrStdin())
+	in := ReadFromArgsOrStdin(args[len(args)-1:], cmd.InOrStdin())
 
 	v := semver.MustParse(in[0])
 	switch part {
 	case "major":
-		err := v.IncrementMajor()
-		if err != nil {
-			return err
-		}
+		b := bump.MajorBump{}
+		v = b.Apply(v)
 
-		fmt.Printf("%d.%d.%d", v.Major, v.Minor, v.Patch)
+		fmt.Printf("%s", v)
 		return nil
 	case "minor":
-		err := v.IncrementMinor()
-		if err != nil {
-			return err
-		}
+		b := bump.MinorBump{}
+		v = b.Apply(v)
 
-		fmt.Printf("%d.%d.%d", v.Major, v.Minor, v.Patch)
+		fmt.Printf("%s", v)
 		return nil
 	case "patch":
-		err := v.IncrementPatch()
-		if err != nil {
-			return err
-		}
+		b := bump.PatchBump{}
+		v = b.Apply(v)
 
-		fmt.Printf("%d.%d.%d", v.Major, v.Minor, v.Patch)
+		fmt.Printf("%s", v)
+		return nil
+	case "pre":
+		b := bump.PreBump{
+			Pre: args[1],
+		}
+		v = b.Apply(v)
+
+		fmt.Printf("%s", v)
 		return nil
 	default:
 		return fmt.Errorf("unknown part '%s'", part)
