@@ -8,7 +8,7 @@ before:
 
 builds:
   - id: semver-linux
-    main: ./cmd/semver/semver.go
+    main: ./main.go
     binary: semver
     ldflags:
       - -X github.com/garethjevans/semver/pkg/version.Version={{.Version}} -X github.com/garethjevans/semver/pkg/version.Revision={{.ShortCommit}} -X github.com/garethjevans/semver/pkg/version.BuildDate={{.CommitDate}} -X github.com/garethjevans/semver/pkg/version.BuiltBy=goreleaser
@@ -21,7 +21,7 @@ builds:
       - ppc64le
 
   - id: semver-darwin
-    main: ./cmd/semver/semver.go
+    main: ./main.go
     binary: semver
     ldflags:
       - -X github.com/garethjevans/semver/pkg/version.Version={{.Version}} -X github.com/garethjevans/semver/pkg/version.Revision={{.ShortCommit}} -X github.com/garethjevans/semver/pkg/version.BuildDate={{.CommitDate}} -X github.com/garethjevans/semver/pkg/version.BuiltBy=goreleaser
@@ -32,7 +32,7 @@ builds:
       - arm64
 
   - id: semver-windows-amd64
-    main: ./cmd/semver/semver.go
+    main: ./main.go
     binary: semver
     ldflags:
       - -X github.com/garethjevans/semver/pkg/version.Version={{.Version}} -X github.com/garethjevans/semver/pkg/version.Revision={{.ShortCommit}} -X github.com/garethjevans/semver/pkg/version.BuildDate={{.CommitDate}} -X github.com/garethjevans/semver/pkg/version.BuiltBy=goreleaser
